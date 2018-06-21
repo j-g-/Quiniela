@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 /**
  * Contains methods to manage a "quiniela"
- * @author J. Garcia <jyo.garcia at gmail.com>
+ * @author J. Garcia <u0x004a at gmail.com>
  */
 
 public class Quiniela {
