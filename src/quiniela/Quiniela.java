@@ -38,7 +38,7 @@ public class Quiniela {
 		public int gameID;
 		String teamNames[] = {"",""};
 		int scores[] = {-1,-1};
-		int Winner = -1;
+		int winner = -1;
 		/**
 		 * Game Constructor
 		 * @param team1Name name for first team playing.
@@ -58,6 +58,34 @@ public class Quiniela {
 		public void setScores(int team1Score, int team2Score){
 			scores[0] = team1Score;
 			scores[1] = team2Score;
+		}
+		/**
+		 * Check if scores are valid.
+		 * @return true if scores are >= 0 
+		 */
+		public boolean checkValidScores(){
+			if (scores[0] == -1 && scores[1] == -1){
+				return true;
+			} else {
+				return false;
+			}
+		}
+		/**
+		 * Check winner index.
+		 */
+		public void updateWinner(){
+			if (checkValidScores()){
+				if (scores[0] > scores[1] ){
+					winner = 0;
+				} else if (scores[1] > scores[0]){
+					winner = 1;
+				} else {
+					winner = -1;
+				}
+			} else {
+				winner = -1;
+			}
+			
 		}
 	
 	}
@@ -113,7 +141,6 @@ public class Quiniela {
 			
 	/**
 	 * Get a yes or no from user.
-	 *
 	 * @return boolean with value.
 	 */
 	static boolean askYesOrNo() {
