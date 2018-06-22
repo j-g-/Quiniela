@@ -190,7 +190,6 @@ public class Quiniela {
 	
 			
 	static int[] askScore(int currentScore[]){
-		static int[] askScore(int currentScore[]){
 		int[] score = new int[2];
 		for (;;){
 			System.out.print("Enter score in using eg. 0-0 or n to keep current score : ");
