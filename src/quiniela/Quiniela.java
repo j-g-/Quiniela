@@ -190,17 +190,27 @@ public class Quiniela {
 	
 			
 	static int[] askScore(int currentScore[]){
-		System.out.print("Enter new score eg. 0-0 or n to keep current: ");
-		Scanner scr = new Scanner(System.in);
-		String input = scr.nextLine();
+		static int[] askScore(int currentScore[]){
 		int[] score = new int[2];
-		if (input.contentEquals("n")){
-			score = currentScore;
-		} else {
-			String parts[] = input.split("-");
-			score[0] = Integer.parseInt(parts[0]);
-			score[1] = Integer.parseInt(parts[1]);
-		}
+		for (;;){
+			System.out.print("Enter score in using eg. 0-0 or n to keep current score : ");
+			Scanner scr = new Scanner(System.in);
+			String input = scr.nextLine();
+			
+			if (input.contentEquals("n")){
+				score = currentScore;
+				break;
+			} else {
+				String parts[] = input.split("-");
+				if (parts.length == 2)  {
+					score[0] = Integer.parseInt(parts[0]);
+					score[1] = Integer.parseInt(parts[1]);
+					break;
+				} else {
+					System.out.print("Invalid entry. ");
+				} 
+			}
+		}	
 		return score;
 	}
 	/**
