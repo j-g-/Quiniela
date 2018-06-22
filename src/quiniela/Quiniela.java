@@ -40,10 +40,17 @@ public class Quiniela {
 			predictedScore[0] = team1Score;
 			predictedScore[1] = team2Score;
 		}
+		
+		/**
+		 * Update the winner for this prediction.
+		 * updates the winner in this prediction.
+		 */
 		public void updatePredictedWinner(){
 			this.predictedWinner = analyzeScore(predictedScore);
 		}
-
+		/**
+		 * Calculate points obtained.
+		 */
 		public void calculatePointsObtained(){
 			this.pointsObtained = 0;
 			this.updatePredictedWinner();
@@ -58,7 +65,10 @@ public class Quiniela {
 			}
 		}
 	} 
-
+	/**
+	 * Holds the information about teams and score for a game.
+	 * Methods for setting the score and update the winner if any.
+	 */
 	class Game {
 		public int gameID;
 		String teamNames[] = {"",""};
@@ -92,16 +102,25 @@ public class Quiniela {
 			this.winner = analyzeScore(score);
 		}
 	}
-
+	/**
+	 * Holds the information for a participant in the pools.
+	 * Contains list of predictions and name of participant.
+	 */
 	class Participant {
 		String name ;
 		ArrayList<Prediction> predictions; 
 		int totalPoints = 0;
+		/**
+		 * Constructor using name, and empty predictions.
+		 */
 		public Participant(String name) {
 			this.name = name;
 			predictions = null; 
 		}
-
+		/**
+		 * Update the predictions list.
+		 * @param predictions new list to use.
+		 */
 		public void updatePredictions( ArrayList<Prediction> predictions){
 			this.predictions = predictions;
 		}
@@ -148,6 +167,10 @@ public class Quiniela {
 		Game g = new Game(t1, t2, gameCount);
 		this.games.add(g);
 	}
+	/**
+	 * Update game scores in this pool.
+	 * Gives option to keep score or enter new one from standard input.
+	 */
 	public void updateGameScores(){
 		for (Game g : this.games){
 			System.out.print(
@@ -167,7 +190,9 @@ public class Quiniela {
 			askScore(g.score);
 		}
 	}
-	
+	/**
+	 * Creates the participant list or adds participants to existing list.
+	 */
 	public void createParticipantsList(){
 		if (this.participants == null){
 			this.participants = new ArrayList<>();
@@ -179,7 +204,9 @@ public class Quiniela {
 			keepAdding = askYesOrNo();
 		}
 	}
-
+	/**
+	 * Adds a new participant to the list from standard input.
+	 */
 	public void addParticipant(){
 		Scanner scr = new Scanner(System.in);
 		System.out.println("Enter name of participant:");
@@ -188,7 +215,11 @@ public class Quiniela {
 		this.participants.add(p);
 	}
 	
-			
+	/**
+	 * Asks score from standard input.
+	 * Uses an array int[2] to save scores.
+	 * @param currentScore current score saved to give option to keep it.
+	 */		
 	static int[] askScore(int currentScore[]){
 		int[] score = new int[2];
 		for (;;){
