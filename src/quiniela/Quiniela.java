@@ -19,25 +19,50 @@ public class Quiniela {
 	/**
 	 * Holds the information about a score prediction
 	 */
+
 	class Prediction {
 		Game game;
-		int predictedScores[] = {0,0};
+		int[] predictedScore = new int[2];
 		int pointsObtained = 0;
+		int predictedWinner =  -1;
+		public Prediction (int scoreTeam1, int scoreTeam2, Game game){
+			this.game = game;
+			this.predictedScore[0] = scoreTeam1;
+			this.predictedScore[1] = scoreTeam2;
+		}
+
 		/**
 		 * Set a score prediction.
 		 * @param team1Score score predicted for first team.
  		 * @param team2Score score predicted for second team.
 		 */
 		public void setPrediction(int team1Score, int team2Score){
-			predictedScores[0] = team1Score;
-			predictedScores[1] = team2Score;
+			predictedScore[0] = team1Score;
+			predictedScore[1] = team2Score;
+		}
+		public void updatePredictedWinner(){
+			this.predictedWinner = analyzeScore(predictedScore);
+		}
+
+		public void calculatePointsObtained(){
+			this.pointsObtained = 0;
+			this.updatePredictedWinner();
+			if (this.predictedWinner == this.game.winner) {
+				this.pointsObtained += 3;
+			}
+			if (this.predictedScore[0] == this.game.score[0]) {
+				this.pointsObtained += 1;
+			}
+			if (this.predictedScore[1] == this.game.score[1]) {
+				this.pointsObtained += 1;
+			}
 		}
 	} 
 
 	class Game {
 		public int gameID;
 		String teamNames[] = {"",""};
-		int scores[] = {-1,-1};
+		int score[] ;
 		int winner = -1;
 		/**
 		 * Game Constructor
@@ -48,7 +73,8 @@ public class Quiniela {
 		public Game(String team1Name, String team2Name, int gameID){
 			this.teamNames[0] = team1Name;
 			this.teamNames[1] = team2Name;
-		
+			this.score = new int[2];
+			this.setScores( -1, -1);
 		}
 		/**
 		 * Set a score for a game.
@@ -56,44 +82,29 @@ public class Quiniela {
  		 * @param team2Score score obtained by the second team.
 		 */
 		public void setScores(int team1Score, int team2Score){
-			scores[0] = team1Score;
-			scores[1] = team2Score;
-		}
-		/**
-		 * Check if scores are valid.
-		 * @return true if scores are >= 0 
-		 */
-		public boolean checkValidScores(){
-			if (scores[0] == -1 && scores[1] == -1){
-				return true;
-			} else {
-				return false;
-			}
+			score[0] = team1Score;
+			score[1] = team2Score;
 		}
 		/**
 		 * Check winner index.
 		 */
 		public void updateWinner(){
-			if (checkValidScores()){
-				if (scores[0] > scores[1] ){
-					winner = 0;
-				} else if (scores[1] > scores[0]){
-					winner = 1;
-				} else {
-					winner = -1;
-				}
-			} else {
-				winner = -1;
-			}
-			
+			this.winner = analyzeScore(score);
 		}
-	
 	}
 
 	class Participant {
-		String name = "";
+		String name ;
 		ArrayList<Prediction> predictions; 
 		int totalPoints = 0;
+		public Participant(String name) {
+			this.name = name;
+			predictions = null; 
+		}
+
+		public void updatePredictions( ArrayList<Prediction> predictions){
+			this.predictions = predictions;
+		}
 		/**
 		 * Calculate total sum of points obtained.		 
 		 */
@@ -109,7 +120,7 @@ public class Quiniela {
 
 	public Quiniela() {
 		this.createGameList();
-		this.participants = new ArrayList<>();
+		this.participants = null;
 	}
 	/**
 	 * Create a list of games asking to enter info from standard input.
@@ -137,8 +148,61 @@ public class Quiniela {
 		Game g = new Game(t1, t2, gameCount);
 		this.games.add(g);
 	}
+	public void updateGameScores(){
+		for (Game g : this.games){
+			System.out.print(
+						String.format("Game, %s vs %s. ", 
+						g.teamNames[0], g.teamNames[1])
+			);
+
+			if (isScoreValid(g.score)){
+				System.out.println(
+						String.format("Current score is %d-%d", 
+						  g.score[0], g.score[1]
+						)
+				);
+			} else {
+				System.out.println("No scored.");
+			}
+			askScore(g.score);
+		}
+	}
+	
+	public void createParticipantsList(){
+		if (this.participants == null){
+			this.participants = new ArrayList<>();
+		}
+		boolean keepAdding = true;
+		while (keepAdding){
+			addGame();
+			System.out.print("Add another participant?");
+			keepAdding = askYesOrNo();
+		}
+	}
+
+	public void addParticipant(){
+		Scanner scr = new Scanner(System.in);
+		System.out.println("Enter name of participant:");
+		String name = scr.nextLine();
+		Participant p = new Participant(name);
+		this.participants.add(p);
+	}
 	
 			
+	static int[] askScore(int currentScore[]){
+		System.out.print("Enter new score eg. 0-0 or n to keep current: ");
+		Scanner scr = new Scanner(System.in);
+		String input = scr.nextLine();
+		int[] score = new int[2];
+		if (input.contentEquals("n")){
+			score = currentScore;
+		} else {
+			String parts[] = input.split("-");
+			score[0] = Integer.parseInt(parts[0]);
+			score[1] = Integer.parseInt(parts[1]);
+		}
+		return score;
+	}
 	/**
 	 * Get a yes or no from user.
 	 * @return boolean with value.
@@ -163,6 +227,38 @@ public class Quiniela {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Check if score is valid.
+	 * Checks the score entered is more than 0.
+	 * @return true if scores are valid
+	 */
+	static boolean isScoreValid(int score[]){
+		if (score[0] >= -1 && score[1] >= -1){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	/**
+	 * Finds the winner index.
+	 * Checks who is the winner if any.
+	 * @return winner index, or -1 if there is a tie.
+	 */
+	static int analyzeScore(int score[]){
+		int winner = -1;
+		if (isScoreValid(score)){
+			if (score[0] > score[1] ){
+				winner = 0;
+			} else if (score[1] > score[0]){
+				winner = 1;
+			} else {
+				winner = -1; // tie
+			}
+			
+		}
+		return winner;
 	}
 	/**
 	 * @param args the command line arguments
