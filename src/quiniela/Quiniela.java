@@ -317,7 +317,7 @@ public class Quiniela {
 		}
 		return winner;
 	}
-	static void CreateNewPoll(){
+	static void createNewPoll(){
 		//Create new Quiniela
 		Scanner scr = new Scanner(System.in);
 		System.out.print("Creating footbal poll, enter name: ");
