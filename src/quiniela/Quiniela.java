@@ -214,7 +214,21 @@ public class Quiniela {
 		Participant p = new Participant(name);
 		this.participants.add(p);
 	}
+	public void updateParticipantPredictions(Participant p){
+		if (p.predictions == null ){
+			p.predictions = new ArrayList<>();
+		}
+		for (Game g : this.games){
+			int[] predictedScore = {-1,-1};
+			predictedScore = askScore(predictedScore);
+			System.out.println(String.format("Prediction for game: %s vs %s", 
+											 g.teamNames[0], g.teamNames[1])
+							  );
+			Prediction prediction = new Prediction(predictedScore[0],predictedScore[1], g);
+			p.predictions.add(prediction);
+		}
 	
+	}
 	/**
 	 * Asks score from standard input.
 	 * Uses an array int[2] to save scores.
