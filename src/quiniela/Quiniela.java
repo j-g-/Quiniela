@@ -10,17 +10,15 @@ import java.util.Scanner;
 
 /**
  * Contains methods to manage a "quiniela"
- * @author J. Garcia <u0x004a at gmail.com>
+ * @author J. Garcia 
  */
 
 public class Quiniela {
-
-
 	/**
 	 * Holds the information about a score prediction
 	 */
 
-	class Prediction {
+	public class Prediction {
 		Game game;
 		int[] predictedScore = new int[2];
 		int pointsObtained = 0;
@@ -54,6 +52,7 @@ public class Quiniela {
 		public void calculatePointsObtained(){
 			this.pointsObtained = 0;
 			this.updatePredictedWinner();
+			this.game.updateWinner();
 			if (this.predictedWinner == this.game.winner) {
 				this.pointsObtained += 3;
 			}
@@ -69,13 +68,13 @@ public class Quiniela {
 	 * Holds the information about teams and score for a game.
 	 * Methods for setting the score and update the winner if any.
 	 */
-	class Game {
+	public class Game {
 		public int gameID;
 		String teamNames[] = {"",""};
 		int score[] ;
 		int winner = -1;
 		/**
-		 * Game Constructor
+		 * Game Constructor.
 		 * @param team1Name name for first team playing.
 		 * @param team2Name name for second team playing.
 		 * @param gameID unique integer to identify this game.
@@ -106,7 +105,7 @@ public class Quiniela {
 	 * Holds the information for a participant in the pools.
 	 * Contains list of predictions and name of participant.
 	 */
-	class Participant {
+	public class Participant {
 		String name ;
 		ArrayList<Prediction> predictions; 
 		int totalPoints = 0;
@@ -129,7 +128,24 @@ public class Quiniela {
 		 */
 		public void calculateTotalPoints(){
 			for (Prediction p : predictions){
-				totalPoints += p.pointsObtained;
+				p.calculatePointsObtained();
+				this.totalPoints += p.pointsObtained;
+			}
+		}
+
+		/**
+		 * Prints participant predictions to standard output.
+		 */
+		private void printPredictions() {
+			System.out.println("Saved predictions:");
+			for (Prediction pred: this.predictions){
+				System.out.println(
+						String.format("%s vs %s: %d-%d", 
+								pred.game.teamNames[0],
+								pred.game.teamNames[1],
+								pred.predictedScore[0],
+								pred.predictedScore[1]
+								));
 			}
 		}
 	} 
@@ -137,6 +153,12 @@ public class Quiniela {
 	ArrayList<Participant> participants; 
 	public int gameCount = 0;
 	public String pollName;
+
+	/**
+	 * Quiniela constructor.
+	 * Just sets the name for the poll.
+	 * @param name Name to set for this poll. 
+	 */
 	public Quiniela(String name) {
 		this.games = null;
 		
@@ -216,21 +238,66 @@ public class Quiniela {
 		Participant p = new Participant(name);
 		this.participants.add(p);
 	}
-	public void updateParticipantPredictions(Participant p){
-		ArrayList<Prediction> predictions = new ArrayList<>();
+	/**
+	 * Update predictions for participant P from standard input.
+	 * @param p Participant to update.
+	 */
+	private void updateParticipantPredictions(Participant p){
+		ArrayList<Prediction> newPredictions = new ArrayList<>();
+		System.out.println("Enter predictions by " + p.name + ".");
 		for (Game g : this.games){
 			int[] predictedScore = {-1,-1};
-			predictedScore = askScore(predictedScore);
 			System.out.println(String.format("Prediction for game: %s vs %s", 
 											 g.teamNames[0], g.teamNames[1]));
-			Prediction prediction = new Prediction(predictedScore[0],predictedScore[1], g);
-			p.updatePredictions(predictions);
+			predictedScore = askScore(predictedScore);
+			Prediction pred = new Prediction(predictedScore[0],predictedScore[1], g);
+			newPredictions.add(pred);
 		}	
+		p.updatePredictions(newPredictions);
+		p.printPredictions();
 	}
+	/**
+	 * Updates the score predictions for all participants.
+	 */
 	public void updatePredictedScores(){
 		for(Participant p : this.participants){
 			this.updateParticipantPredictions(p);
 		}
+	}
+	/**
+	 * Calculate points obtained by all participants.
+	 */
+	private void calculateParticipantsPoints() {
+		for(Participant p : this.participants){
+			p.calculateTotalPoints();
+		}
+	}
+
+	/**
+	 * Print participants and ponts obtained.
+	 */
+	public void printParticipants(){
+		System.out.println("********************************************************************************");
+		System.out.println("Participants points ");
+		System.out.println("********************************************************************************");
+		for(Participant p : this.participants){
+			System.out.println(String.format("%s\t%d", p.name,p.totalPoints));
+		}
+	}
+	/**
+	 * Prints the participant that is the winner.
+	 */
+	public void printWinnerParticipant(){
+		Participant winner = this.participants.get(0);
+		for(Participant p : participants){
+			if(p.totalPoints > winner.totalPoints){
+				winner = p;
+			}
+		}
+		System.out.println("********************************************************************************");
+		System.out.println(String.format("WINNER!!!%s with %d points.", 
+										  winner.name, winner.totalPoints));
+		System.out.println("********************************************************************************");
 	}
 	/**
 	 * Asks score from standard input.
@@ -317,6 +384,9 @@ public class Quiniela {
 		}
 		return winner;
 	}
+	/**
+	 * Creates and run a football poll.
+	 */
 	static void createNewPoll(){
 		//Create new Quiniela
 		Scanner scr = new Scanner(System.in);
@@ -324,17 +394,34 @@ public class Quiniela {
 		String pollName = scr.nextLine();
 		Quiniela poll = new Quiniela(pollName);
 		// Initialize poll games
+		System.out.println("********************************************************************************");
+		System.out.println("Creating game list.");
+		System.out.println("********************************************************************************");
 		poll.createGameList();
+		System.out.println("********************************************************************************");
+		System.out.println("Creating participants list.");
+		System.out.println("********************************************************************************");
 		poll.createParticipantsList();
-		
+		System.out.println("********************************************************************************");
+		System.out.println("Update predictions.");
+		System.out.println("********************************************************************************");
 		poll.updatePredictedScores();
-		poll.updateGamesScores();
+		System.out.println("********************************************************************************");
+		System.out.println("Update gameScores.");
+		System.out.println("********************************************************************************");
+		poll.updateGameScores();
+		System.out.println("********************************************************************************");
+		System.out.println("Analyzing predictions and games");
+		System.out.println("********************************************************************************");
+		poll.calculateParticipantsPoints();
+		poll.printParticipants();
+		poll.printWinnerParticipant();
 	}
 	/**
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-		// TODO code application logic here
+		createNewPoll();
 	}
 	
 }
