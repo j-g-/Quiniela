@@ -100,6 +100,21 @@ public class Quiniela {
 		public void updateWinner(){
 			this.winner = analyzeScore(score);
 		}
+		/**
+		 * Prints the game winner to standard output.
+		 */
+		public void printWinner(){
+			this.updateWinner();
+			String winner = "None";
+			if (this.score[0] > score[1]) {
+				winner = this.teamNames[0];
+			}
+			if (this.score[1] > score[0]) {
+				winner = this.teamNames[1];
+			}
+			System.out.println("Winner is: " + winner );
+		
+		}
 	}
 	/**
 	 * Holds the information for a participant in the pools.
@@ -197,6 +212,7 @@ public class Quiniela {
 	 */
 	public void updateGameScores(){
 		for (Game g : this.games){
+			int [] newScore;
 			System.out.print(
 						String.format("Game, %s vs %s. ", 
 						g.teamNames[0], g.teamNames[1])
@@ -211,7 +227,9 @@ public class Quiniela {
 			} else {
 				System.out.println("No scored.");
 			}
-			askScore(g.score);
+			newScore = askScore(g.score);
+			g.setScores(newScore[0], newScore[1]);
+			g.printWinner();
 		}
 	}
 	/**
@@ -295,8 +313,10 @@ public class Quiniela {
 			}
 		}
 		System.out.println("********************************************************************************");
-		System.out.println(String.format("WINNER!!!%s with %d points.", 
-										  winner.name, winner.totalPoints));
+		System.out.println(String.format("WINNER of pool %s !!!%s with %d points.", 
+										  this.pollName, 
+										  winner.name,
+										  winner.totalPoints));
 		System.out.println("********************************************************************************");
 	}
 	/**
@@ -304,7 +324,7 @@ public class Quiniela {
 	 * Uses an array int[2] to save scores.
 	 * @param currentScore current score saved to give option to keep it.
 	 */		
-	static int[] askScore(int currentScore[]){
+	public static int[] askScore(int currentScore[]){
 		int[] score = new int[2];
 		for (;;){
 			System.out.print("Enter score in using eg. 0-0 or n to keep current score : ");
@@ -331,7 +351,7 @@ public class Quiniela {
 	 * Get a yes or no from user.
 	 * @return boolean with value.
 	 */
-	static boolean askYesOrNo() {
+	public static boolean askYesOrNo() {
 		boolean result = false;
 		Scanner s = new Scanner(System.in);
 		for (;;) {
@@ -358,7 +378,7 @@ public class Quiniela {
 	 * Checks the score entered is more than 0.
 	 * @return true if scores are valid
 	 */
-	static boolean isScoreValid(int score[]){
+	public static boolean isScoreValid(int score[]){
 		if (score[0] >= -1 && score[1] >= -1){
 			return true;
 		} else {
@@ -370,7 +390,7 @@ public class Quiniela {
 	 * Checks who is the winner if any.
 	 * @return winner index, or -1 if there is a tie.
 	 */
-	static int analyzeScore(int score[]){
+	public static int analyzeScore(int score[]){
 		int winner = -1;
 		if (isScoreValid(score)){
 			if (score[0] > score[1] ){
@@ -387,7 +407,7 @@ public class Quiniela {
 	/**
 	 * Creates and run a football poll.
 	 */
-	static void createNewPoll(){
+	public static void createNewPoll(){
 		//Create new Quiniela
 		Scanner scr = new Scanner(System.in);
 		System.out.print("Creating footbal poll, enter name: ");
