@@ -136,10 +136,12 @@ public class Quiniela {
 	ArrayList<Game> games;
 	ArrayList<Participant> participants; 
 	public int gameCount = 0;
-
-	public Quiniela() {
-		this.createGameList();
+	public String pollName;
+	public Quiniela(String name) {
+		this.games = null;
+		
 		this.participants = null;
+		this.pollName = name;
 	}
 	/**
 	 * Create a list of games asking to enter info from standard input.
@@ -199,8 +201,8 @@ public class Quiniela {
 		}
 		boolean keepAdding = true;
 		while (keepAdding){
-			addGame();
-			System.out.print("Add another participant?");
+			this.addParticipant();
+			System.out.print("Add another participant? ");
 			keepAdding = askYesOrNo();
 		}
 	}
@@ -224,6 +226,11 @@ public class Quiniela {
 			Prediction prediction = new Prediction(predictedScore[0],predictedScore[1], g);
 			p.updatePredictions(predictions);
 		}	
+	}
+	public void updatePredictedScores(){
+		for(Participant p : this.participants){
+			this.updateParticipantPredictions(p);
+		}
 	}
 	/**
 	 * Asks score from standard input.
@@ -309,6 +316,19 @@ public class Quiniela {
 			
 		}
 		return winner;
+	}
+	static void CreateNewPoll(){
+		//Create new Quiniela
+		Scanner scr = new Scanner(System.in);
+		System.out.print("Creating footbal poll, enter name: ");
+		String pollName = scr.nextLine();
+		Quiniela poll = new Quiniela(pollName);
+		// Initialize poll games
+		poll.createGameList();
+		poll.createParticipantsList();
+		
+		poll.updatePredictedScores();
+		poll.updateGamesScores();
 	}
 	/**
 	 * @param args the command line arguments
