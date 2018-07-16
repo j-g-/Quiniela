@@ -11,6 +11,7 @@ import java.util.Scanner;
 /**
  * Contains methods to manage a "quiniela"
  * @author J. Garcia 
+ * @since 1.0
  */
 
 public class Quiniela {
